@@ -25,7 +25,8 @@ function App() {
     setError(null)
     setResult(null)
     try {
-      const response = await axios.post('http://127.0.0.1:8000/predict', { text: text })
+      const response = await axios.post('https://behind-the-headlines-api.onrender.com/predict', {
+      text: input,});
       setResult(response.data)
     } catch (err) {
       setError("The wire is dead. Cannot connect to the analysis engine.")
