@@ -24,9 +24,15 @@ except Exception as e:
     vectorizer = None
     model = None
 
-# Define what data the API expects from React
+# Define what data the API expects from React for analysis
 class NewsInput(BaseModel):
     text: str
+
+# 🕵️‍♂️ NEW: Define what data the API expects for a discrepancy report
+class DiscrepancyReport(BaseModel):
+    prediction: str
+    confidence: float
+    flagged_as_wrong: bool
 
 @app.get("/")
 def read_root():
@@ -67,3 +73,16 @@ async def predict_news(news: NewsInput):
     except Exception as e:
         print(f"Prediction error: {e}")
         raise HTTPException(status_code=500, detail=f"Model execution error: {str(e)}")
+
+# 🚨 NEW: The route to catch the Discrepancy Reports
+@app.post("/report")
+async def receive_report(report: DiscrepancyReport):
+    # For the hackathon, printing it to the terminal proves the wire is working!
+    print("\n" + "="*40)
+    print("🚨 NEW DISCREPANCY REPORT FILED 🚨")
+    print(f"Original Prediction: {report.prediction}")
+    print(f"Confidence Level: {report.confidence}")
+    print(f"Flagged as Wrong: {report.flagged_as_wrong}")
+    print("="*40 + "\n")
+    
+    return {"status": "Report received successfully by headquarters"}

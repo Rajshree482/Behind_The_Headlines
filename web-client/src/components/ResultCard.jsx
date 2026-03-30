@@ -1,21 +1,27 @@
 import { useState } from 'react';
-import axios from 'axios'; // 1. Added axios import
+import axios from 'axios';
 
 const ResultCard = ({ result }) => {
   const [isReported, setIsReported] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Added loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isAuthentic = result.prediction === "Real";
   
-  const stampColor = isAuthentic ? "text-vintage-emerald border-vintage-emerald" : "text-vintage-crimson border-vintage-crimson";
-  const stampText = isAuthentic ? "VERIFIED: AUTHENTIC" : "DEBUNKED: FABRICATION";
+  // Dynamic UI States: Flip to RED and "UNAUTHENTIC" if a report is filed
+  const stampColor = (isAuthentic && !isReported) 
+    ? "text-vintage-emerald border-vintage-emerald" 
+    : "text-vintage-crimson border-vintage-crimson";
+    
+  const stampText = isReported 
+    ? "VERIFIED: UNAUTHENTIC!" 
+    : (isAuthentic ? "VERIFIED: AUTHENTIC" : "DEBUNKED: FABRICATION");
 
-  // 2. New function to handle the cloud report
+  const barColor = isReported ? "bg-vintage-crimson" : "bg-vintage-ink";
+
   const handleReport = async () => {
     setIsSubmitting(true);
     try {
-      // REPLACE with your actual Render URL ending in /report
-      await axios.post('https://behind-the-headlines-api.onrender.com/report', {
+      await axios.post('http://127.0.0.1:8000/report', {
         prediction: result.prediction,
         confidence: result.confidence,
         flagged_as_wrong: true
@@ -31,14 +37,14 @@ const ResultCard = ({ result }) => {
   };
 
   return (
-    <div className="relative p-8 bg-[#fdfaf5] border-2 border-gray-300 shadow-[4px_6px_20px_rgba(0,0,0,0.6)] transform -rotate-1 mt-6">
+    <div className="relative p-8 bg-[#fdfaf5] border-2 border-gray-300 shadow-[4px_6px_20px_rgba(0,0,0,0.6)] transform -rotate-1 mt-6 transition-all duration-500">
       
       <div className="absolute -top-4 right-8 w-4 h-12 border-4 border-gray-400 rounded-full"></div>
 
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 border-b-2 border-vintage-ink/20 pb-6">
         <div>
           <p className="text-sm font-bold text-vintage-ink/60 uppercase tracking-widest mb-1">Analysis Conclusion:</p>
-          <div className={`inline-block border-4 px-4 py-2 mt-2 transform -rotate-3 ${stampColor} opacity-90`}>
+          <div className={`inline-block border-4 px-4 py-2 mt-2 transform -rotate-3 ${stampColor} opacity-90 transition-colors duration-500`}>
             <h2 className="text-3xl md:text-4xl font-extrabold uppercase tracking-tighter">
               {stampText}
             </h2>
@@ -53,18 +59,28 @@ const ResultCard = ({ result }) => {
         </p>
         <div className="w-full bg-gray-300 h-6 mt-2 border border-vintage-ink relative overflow-hidden">
            <div 
-            className="absolute top-0 left-0 h-full bg-vintage-ink opacity-80 transition-all duration-1000 ease-out"
+            className={`absolute top-0 left-0 h-full ${barColor} opacity-80 transition-colors duration-1000 ease-out`}
             style={{ width: `${Math.max(0, Math.min(100, result.confidence * 100))}%` }}
           ></div>
         </div>
       </div>
+
+      {/* NEW: Simplified, clean text block matching the beige background */}
+      {isReported && (
+        <div className="mb-6 text-vintage-ink font-mono text-sm leading-relaxed border-l-4 border-vintage-crimson pl-4">
+          <p className="font-bold text-vintage-crimson">🚨 DISCREPANCY REPORT FILED 🚨</p>
+          <p>Original Prediction: {result.prediction}</p>
+          <p>Confidence Level: {result.confidence}</p>
+          <p>Flagged as Wrong: True</p>
+        </div>
+      )}
 
       <div className="pt-4 border-t-2 border-dashed border-vintage-ink/30">
         {!isReported ? (
            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
              <p className="text-sm font-bold text-vintage-ink/70">Does this intel seem flawed?</p>
              <button 
-               onClick={handleReport} // 3. Updated to use handleReport
+               onClick={handleReport}
                disabled={isSubmitting}
                className={`text-xs uppercase tracking-widest font-bold border-2 border-vintage-ink px-4 py-2 transition-colors ${
                  isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-vintage-ink hover:text-vintage-paper'
@@ -74,7 +90,7 @@ const ResultCard = ({ result }) => {
              </button>
            </div>
         ) : (
-          <p className="text-sm font-bold text-vintage-ink text-center uppercase tracking-widest">
+          <p className="text-sm font-bold text-vintage-ink text-center uppercase tracking-widest transition-opacity duration-1000">
              [ Report Filed. The agency thanks you. ]
           </p>
         )}
