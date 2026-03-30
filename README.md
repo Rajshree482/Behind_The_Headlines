@@ -23,7 +23,7 @@ Misinformation spreads rapidly online, and identifying fake news manually is imp
 Because the Machine Learning models are too large to host on GitHub, you will need to download them separately before running the application.
 
 ### 1. Retrieve the Classified Intel (ML Models)
-1. Download `model.pkl` and `vectorizer.pkl` from the team's secure drive [INSERT YOUR GOOGLE DRIVE LINK HERE].
+1. Download `model.pkl` and `vectorizer.pkl` from the team's secure drive [https://drive.google.com/drive/folders/1dkx6ZIOfHnF9XJficlJmDtShD_FhJDHh?usp=sharing].
 2. Place both files directly inside the `ml-backend/` folder.
 
 ### 2. Boot up the Analysis Engine (Backend)
